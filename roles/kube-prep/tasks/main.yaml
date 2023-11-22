@@ -1,0 +1,116 @@
+- name: apt install
+  ansible.builtin.apt:
+    name:
+      - iptables
+      - curl
+      - ca-certificates
+      - gpg
+      - jq
+      - ipvsadm
+    state: latest
+
+- name: add kernel modules
+  block:
+    - name: modules-load.d file k8s.conf
+      ansible.builtin.copy:
+        src:   modules-k8s.conf
+        dest:  /etc/modules-load.d/k8s.conf
+        owner: root
+        group: root
+        mode:  0644
+
+    - name: modprobe overlay
+      community.general.modprobe:
+        name: overlay
+        state: present
+
+    - name: modprobe br_netfilter
+      community.general.modprobe:
+        name: br_netfilter
+        state: present
+
+- name: add sysctl params
+  block:
+    - name: sysctl.d file k8s.conf
+      ansible.builtin.copy:
+        src:   sysctl-k8s.conf
+        dest:  /etc/sysctl.d/k8s.conf
+        owner: root
+        group: root
+        mode:  0644
+      notify:
+        - load new sysctl settings
+
+    - name: flush sysctl handlers
+      meta: flush_handlers
+
+- name: set up containerd
+  block:
+    - name: get repo gpg key
+      ansible.builtin.shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/containerd.gpg
+        chmod a+r /etc/apt/keyrings/containerd.gpg
+      args:
+        creates: /etc/apt/keyrings/containerd.gpg
+
+    - name: add docker containerd repo to apt
+      ansible.builtin.apt_repository:
+        filename: containerd
+        repo: deb [arch=arm64 signed-by=/etc/apt/keyrings/containerd.gpg] https://download.docker.com/linux/ubuntu jammy stable
+        state: present
+        update_cache: true
+
+    - name: install containerd.io
+      ansible.builtin.apt:
+        name: containerd.io
+        state: present
+      notify: remove containerd config file
+
+    - name: flush config.toml handlers
+      meta: flush_handlers
+
+    - name: create containerd config file
+      ansible.builtin.shell:
+        cmd: 'containerd config default > /etc/containerd/config.toml'
+        creates: /etc/containerd/config.toml
+
+    - name: change cgroup driver to systemd
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        search_string: 'SystemdCgroup = false'
+        line: '            SystemdCgroup = true'
+        state: present
+      notify: restart containerd
+
+    - name: flush containerd handlers
+      meta: flush_handlers
+
+- name: set up Kubernetes apt repo
+  block:
+    - name: get kubernetes repo gpg key
+      ansible.builtin.shell: |
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+        chmod a+r /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+    - name: add kubernetes repo to apt
+      ansible.builtin.apt_repository:
+        filename: kubernetes
+        repo: deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /
+        state: present
+        update_cache: true
+
+    - name: install kubectl kubeadm and kubelet
+      ansible.builtin.apt:
+        name:
+          - kubelet
+          - kubeadm
+          - kubectl
+        state: present
+      notify: apt-mark kubelet kubeadm kubectl
+
+    - name: flush kubernetes handlers
+      meta: flush_handlers
+
+

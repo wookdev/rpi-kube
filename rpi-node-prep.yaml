@@ -1,0 +1,4 @@
+---
+- hosts: pihosts
+  roles:
+    - node-prep

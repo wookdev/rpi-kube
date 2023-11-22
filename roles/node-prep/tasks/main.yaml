@@ -1,0 +1,38 @@
+---
+
+- name: install some packages
+  ansible.builtin.apt:
+    name:
+      - rpi-eeprom
+      - libraspberrypi-bin
+      - curl
+      - file
+      - vim
+      - lsscsi
+      - sg3-utils
+      - psmisc
+    state: present
+
+- name: install /etc/hosts
+  ansible.builtin.copy:
+    src: hosts
+    dest: /etc/hosts
+    backup: true
+
+- name: install .ssh/known_hosts
+  ansible.builtin.copy:
+    src: known_hosts
+    dest: /root/.ssh/known_hosts
+    mode: '0600'
+    owner: root
+    group: root
+    backup: true
+
+- name: install rpi ssh public key
+  ansible.builtin.lineinfile:
+    line: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIJBUps6+V3VUvL379hmceyItzq2mkpqXDBp7ox1hrYe root@cluster'
+    path: /root/.ssh/authorized_keys
+    state: present
+    owner: root
+    group: root
+    mode: '0600'

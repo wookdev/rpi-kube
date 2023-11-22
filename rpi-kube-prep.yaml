@@ -1,0 +1,4 @@
+---
+- hosts: pihosts
+  roles:
+    - kube-prep

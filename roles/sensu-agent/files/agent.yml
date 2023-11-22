@@ -1,0 +1,9 @@
+---
+#
+# Sensu agent configuration
+#
+
+backend-url:
+  - "ws://192.168.20.21:8081"
+
+log-level: "error" # available log levels: panic, fatal, error, warn, info, debug

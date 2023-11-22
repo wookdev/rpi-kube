@@ -1,0 +1,5 @@
+- name: restart sensu-agent
+  ansible.builtin.systemd_service:
+    name: sensu-agent
+    state: restarted
+    enabled: true

@@ -5,10 +5,11 @@ pihosts:
       hosts:
         pi-1.local:
           ansible_host: 192.168.20.51
-        pi-1.local:
+        pi-2.local:
           ansible_host: 192.168.20.52
       vars:
-        pod_cidr: 172.16.0.0/16
+        pod_cidr: 10.0.0.0/8
+        cluster_name: cluster.local
     piworkers:
       hosts:
         pi-3.local:

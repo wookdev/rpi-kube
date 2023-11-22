@@ -1,0 +1,22 @@
+127.0.0.1 localhost
+::1 localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+
+ff02::2 ip6-allrouters
+
+192.168.20.51  pi-1.local pi-1 cluster.local cluster
+fe80::dea6:32ff:fee9:4c   pi-1.local pi-1
+192.168.20.52  pi-2.local pi-2
+fe80::dea6:32ff:fee9:60   pi-2.local pi-2
+192.168.20.53  pi-3.local pi-3
+fe80::dea6:32ff:fee9:b4   pi-3.local pi-3
+192.168.20.54  pi-4.local pi-4
+fe80::dea6:32ff:fee9:13   pi-4.local pi-4
+192.168.20.55  pi-5.local pi-5
+fe80::dea6:32ff:fee8:feb9   pi-5.local pi-5
+192.168.20.56  pi-6.local pi-6
+fe80::dea6:32ff:fee8:ff47   pi-6.local pi-6
+192.168.20.57  pi-7.local pi-7
+fe80::dea6:32ff:fee8:ff7a   pi-7.local pi-7
+192.168.20.58  pi-8.local pi-8
+fe80::dea6:32ff:fee8:ffaa   pi-8.local pi-8

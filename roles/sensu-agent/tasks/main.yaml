@@ -1,0 +1,21 @@
+---
+
+- name: install sensu-agent repo
+  ansible.builtin.shell: |
+    curl -s https://packagecloud.io/install/repositories/sensu/stable/script.deb.sh | bash
+  args:
+    creates: /etc/apt/sources.list.d/sensu_stable.list
+
+- name: install sensu-agent agent
+  ansible.builtin.apt:
+    name: sensu-go-agent
+    state: present
+
+- name: copy sensu-agent agent.yml
+  ansible.builtin.copy:
+    src: agent.yml
+    dest: /etc/sensu/agent.yml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart sensu-agent

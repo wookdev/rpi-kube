@@ -1,0 +1,3 @@
+- hosts: pihosts
+  roles:
+    - sensu-agent
