@@ -1,68 +1,30 @@
-# rpi-kube-docs
+# RPi-Kube
 
-Notes on creating a k8s cluster on raspberry pis.  The code in the source
-blocks is what I do -- copy-and-paste -- to create the nodes.  I also turned some
-of it into Ansible roles and playbooks.
+Project to install Kubernetes on my 8 node Raspberry Pi cluster.
 
-This process starts at nothing on the RPis at all thru having a working k8s cluster.[^1]
+## Part is Parts:
 
-## Involved Entities:
+The directories in this repo:
 
-* 8 Raspberry Pi 4B 8Gig computers
-  - `pi-1.local` thru `pi-8.local`
-  - They all have RPi PoE+ HATs on them for power
+### ansible
 
-* 1 TrueNAS SCALE 22.12.4.2
-  - `nas1.local`
-  - 10Gbe connection to switch
+Ansible playbooks to do some of the documented tasks.
 
+The goal is to do the whole built in ansible, but for getting-it-up-and-running reasons only
+some of the lowest hanging pieces were done via ansible.
 
-## Configuration Decisions
+### docs
 
-At a high-level these were the deployment goals:
+Instructions for the installation.  For the most part, I just cut and past commands to the 
+shell to do the build.
 
-* Network booting (no SD cards)
-* tftp/nfs boot volume
-* iSCSI root volume
-* minimal Ubuntu image
-* k8s cluster bootstrap `kubeadm`
-* kube-router for a cni
-* single control plane node
-* democratic-csi for storage
-* cert-manager for managing certs
+### helm-values
 
+Decmocratic-csi is installed via helm charts.  These are the values files used.
 
-## Pages and Processes:
+More values files as I need them.
 
-1. [Create the netboot Ubuntu images]() -- Builds the firmware and root filesystems
-2. [Configure the netboot images]() -- Boot from images and configure them
-3. [Prep images for the K8s installs}]() -- Load repos and assorted settings
-4. [Bootstrap the K8s cluster]() -- Create the control plane, apply the CNI, and join workers
-5. [Configure the K8s cluster]() -- Configure the CSI
+### kube-yaml
 
-And...
+Files to test pvc creation once democratic-csi is installed
 
-
-## Sites that Helped Me
-
-These two helped me understand iscsi and using them as root volumes for the RPis.
-
-* [Shawn Wilsher]() -- Network Booting a Raspberry Pi 4 with an iSCSI Root via FreeNAS
-* [Matt Olan]() -- Raspberry Pi iSCSI Root on Ubuntu 20.04
-
-
-## Sideline stuff:
-
-* Sensu for observability and basic monitoring
-
-[^1]: That promise is from another version of these notes that may or may not have been
-converted to this repo when you read this.  I intend to import all of them.
-
-[Create the netboot Ubuntu images]: 1-create-netboot-images.md
-[Configure the netboot images]: 2-configure-netboot-image.md
-[Prep images for the K8s installs}]: 3-prep-kubernetes.md
-[Bootstrap the K8s cluster]: 4-create-kubernetes-cluster.md
-[Configure the K8s cluster]: 5-config-kubernetes-cluster.md
-
-[Shawn Wilsher]: https://shawnwilsher.com/2020/05/network-booting-a-raspberry-pi-4-with-an-iscsi-root-via-freenas/
-[Matt Olan]: https://matt.olan.me/post/raspberry-pi-iscsi-root-on-ubuntu-20-04/
